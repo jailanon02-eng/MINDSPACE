@@ -1,0 +1,86 @@
+// File generated automatic by FlutterFire CLI.
+// ignore_for_file: type=lint
+import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+
+/// Default [FirebaseOptions] for use with your Firebase apps.
+///
+/// Example:
+/// ```dart
+/// import 'firebase_options.dart';
+/// // ...
+/// await Firebase.initializeApp(
+///   options: DefaultFirebaseOptions.currentPlatform,
+/// );
+/// ```
+class DefaultFirebaseOptions {
+  static FirebaseOptions get currentPlatform {
+    if (kIsWeb) {
+      return web;
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return android;
+      case TargetPlatform.iOS:
+        return ios;
+      case TargetPlatform.macOS:
+        return macos;
+      case TargetPlatform.windows:
+        return windows;
+      case TargetPlatform.linux:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for linux - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      default:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions are not supported for this platform.',
+        );
+    }
+  }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCo7K5uMdYeru5_jHhVtVlOu_Cs7uPO28A',
+    appId: '1:47851984231:web:af24c8eaf5cc3f42c78bc2',
+    messagingSenderId: '47851984231',
+    projectId: 'mindspace-app-6d68b',
+    authDomain: 'mindspace-app-6d68b.firebaseapp.com',
+    storageBucket: 'mindspace-app-6d68b.firebasestorage.app',
+  );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyCwL77cyJ6n322fHFEXvAhMh93cC4ju3uU',
+    appId: '1:47851984231:android:83e026ae6498c48dc78bc2',
+    messagingSenderId: '47851984231',
+    projectId: 'mindspace-app-6d68b',
+    storageBucket: 'mindspace-app-6d68b.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCvM0KM9IwkAlqYAXfKfXxpvMvLpntM4Qc',
+    appId: '1:47851984231:ios:f524efc36ad508ccc78bc2',
+    messagingSenderId: '47851984231',
+    projectId: 'mindspace-app-6d68b',
+    storageBucket: 'mindspace-app-6d68b.firebasestorage.app',
+    iosBundleId: 'com.example.mindspace',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCvM0KM9IwkAlqYAXfKfXxpvMvLpntM4Qc',
+    appId: '1:47851984231:ios:f524efc36ad508ccc78bc2',
+    messagingSenderId: '47851984231',
+    projectId: 'mindspace-app-6d68b',
+    storageBucket: 'mindspace-app-6d68b.firebasestorage.app',
+    iosBundleId: 'com.example.mindspace',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCo7K5uMdYeru5_jHhVtVlOu_Cs7uPO28A',
+    appId: '1:47851984231:web:e8c64cfbfedfa3c4c78bc2',
+    messagingSenderId: '47851984231',
+    projectId: 'mindspace-app-6d68b',
+    authDomain: 'mindspace-app-6d68b.firebaseapp.com',
+    storageBucket: 'mindspace-app-6d68b.firebasestorage.app',
+  );
+}
