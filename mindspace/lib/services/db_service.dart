@@ -40,4 +40,8 @@ class DbService {
     await FirebaseStorage.instance.ref('consents/$uid/$fileName').putData(bytes);
     await _user.set({'consentStatus': 'pending', 'consentFile': fileName}, SetOptions(merge: true));
   }
+
+  static Future<void> logActivity(String title, int seconds) => _user
+      .collection('activity')
+      .add({'title': title, 'seconds': seconds, 'at': FieldValue.serverTimestamp()});
 }

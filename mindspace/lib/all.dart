@@ -17,3 +17,4 @@ export 'features/booking/book_screen.dart';
 export 'features/appointments/appointments_tab.dart';
 export 'features/activities/activities_tab.dart';
 export 'features/profile/profile_tab.dart';
+export 'features/activities/activity_players.dart';

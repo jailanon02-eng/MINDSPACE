@@ -1,52 +1,75 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../all.dart';
 
 
-import 'dart:async';
-
 final activityFilter = ValueNotifier<String>('All');
+final minutesToday = ValueNotifier<int>(0);
+
+const kTypes = ['Read', 'Play', 'Watch', 'Move', 'Breathe'];
+const kFocus = ['Anxiety', 'Stress', 'Eating', 'Depression'];
+
+enum Kind { breathe, bubbles, stretch, ground, affirm, scene }
 
 class Activity {
   final String title, desc, type;
   final IconData icon;
   final Color color;
-  final List<String> focus, steps;
+  final Kind kind;
+  final List<String> focus, items;
   final bool free;
-  const Activity(this.title, this.desc, this.type, this.icon, this.color, this.focus, this.steps, {this.free = false});
+  const Activity(this.title, this.desc, this.type, this.icon, this.color, this.kind, this.focus, {this.items = const [], this.free = false});
 }
 
-const kTypes = ['Read', 'Play', 'Watch', 'Move', 'Breathe'];
-const kFocus = ['Anxiety', 'Stress', 'Eating', 'Depression'];
 const activities = [
-  Activity('Box breathing', 'Slow your body down', 'Breathe', Icons.air, Color(0xFF3FA796), ['Anxiety', 'Stress'],
-      ['Breathe in for 4', 'Hold for 4', 'Out for 4', 'Hold for 4. Repeat.'], free: true),
-  Activity('Grounding 5-4-3-2-1', 'Come back to the present', 'Read', Icons.menu_book, Color(0xFF5E57B0), ['Anxiety'],
-      ['Name 5 things you see', '4 you can touch', '3 you hear', '2 you smell, 1 you taste']),
-  Activity('Gentle desk stretch', 'Release tension from burnout', 'Move', Icons.self_improvement, Color(0xFFE9895B), ['Stress', 'Depression'],
-      ['Roll your shoulders slowly', 'Stretch your neck side to side', 'Reach up and breathe', 'Shake out your hands']),
-  Activity('Calm tap', 'A mindful focus game', 'Play', Icons.bubble_chart, Color(0xFF4A90D9), ['Anxiety', 'Stress'],
-      ['Tap slowly, one bubble at a time', 'Notice each breath', 'No score. No rush.']),
-  Activity('Kindness to my body', 'A compassionate reading', 'Read', Icons.favorite_border, Color(0xFFD9638F), ['Eating', 'Depression'],
-      ['Place a hand on your chest', 'Say: I am doing my best today', 'Notice how you feel, without judging']),
-  Activity('Nature moment', 'Relaxing visuals and sounds', 'Watch', Icons.landscape, Color(0xFF6FA86B), ['Stress', 'Depression'],
-      ['Find a comfortable seat', 'Watch and listen', 'Let your thoughts pass by']),
-  Activity('Small win walk', 'A short walk to lift mood', 'Move', Icons.directions_walk, Color(0xFFE0A93B), ['Depression'],
-      ['Step outside or walk a hallway', 'Notice 3 colors', 'Smile at one thing']),
-  Activity('Mealtime calm', 'Ease anxious moments around food', 'Breathe', Icons.spa, Color(0xFF7B9E9A), ['Eating', 'Anxiety'],
-      ['Sit down and unclench your jaw', 'Breathe slowly for a minute', 'Remind yourself: food is care']),
+  Activity('Box breathing', 'Follow the glowing circle', 'Breathe', Icons.air, Color(0xFF3F8F8A), Kind.breathe, ['Anxiety', 'Stress'], free: true),
+  Activity('Pop your worries', 'Tap floating bubbles, no score', 'Play', Icons.bubble_chart, Color(0xFF4A90D9), Kind.bubbles, ['Anxiety', 'Stress']),
+  Activity('Desk reset', 'Six gentle moves for burnout', 'Move', Icons.self_improvement, Color(0xFFE9895B), Kind.stretch, ['Stress', 'Depression']),
+  Activity('5-4-3-2-1 grounding', 'Tap your way back to now', 'Read', Icons.touch_app, Color(0xFF7B6FD0), Kind.ground, ['Anxiety']),
+  Activity('Kind words', 'Swipe through gentle reminders', 'Read', Icons.favorite_border, Color(0xFFD9638F), Kind.affirm, ['Depression', 'Anxiety'], items: [
+    'You do not have to be perfect to be worthy.', 'Small steps still count as progress.',
+    'Your feelings are valid, and they will shift.', 'Rest is productive too.', 'You have gotten through hard days before.', 'Be as gentle with yourself as you would be with a friend.']),
+  Activity('Kind to my body', 'Self-compassion around food', 'Read', Icons.spa_outlined, Color(0xFF6FA86B), Kind.affirm, ['Eating'], items: [
+    'My body deserves care, not punishment.', 'Food is fuel and comfort, not a test.', 'My worth is not measured by what I eat.',
+    'It is okay to take up space.', 'Every meal is a chance to be kind to myself.', 'I am more than how I look.']),
+  Activity('Ocean ripples', 'Touch the water and unwind', 'Watch', Icons.waves, Color(0xFF2F7DA6), Kind.scene, ['Stress', 'Depression', 'Anxiety']),
 ];
 
 class ActivitiesTab extends StatelessWidget {
   const ActivitiesTab({super.key});
+
+  void _open(BuildContext c, Activity a) async {
+    if (!a.free && !await ensureAccess(c)) return;
+    if (!c.mounted) return;
+    Navigator.push(c, PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 450),
+      pageBuilder: (_, __, ___) => ActivityRunner(a),
+      transitionsBuilder: (_, anim, __, child) => FadeTransition(
+          opacity: anim, child: ScaleTransition(scale: Tween(begin: .94, end: 1.0).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)), child: child)),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<String>(
         valueListenable: activityFilter,
         builder: (_, f, __) {
           final shown = activities.where((a) => f == 'All' || a.type == f || a.focus.contains(f)).toList();
           return ListView(padding: const EdgeInsets.all(20), children: [
-            Text('Take 5', style: kTitle.copyWith(fontSize: 28)),
-            const Text('Pick a short activity that fits how you feel.', style: TextStyle(color: kMuted)),
-            const SizedBox(height: 14),
+            Row(children: [
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Take 5', style: kTitle.copyWith(fontSize: 30)),
+                const Text('Tiny breaks, real relief.', style: TextStyle(color: kMuted)),
+              ])),
+              ValueListenableBuilder<int>(
+                valueListenable: minutesToday,
+                builder: (_, m, __) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(color: kPrimary.withOpacity(.12), borderRadius: BorderRadius.circular(20)),
+                  child: Text('🌱 $m min today', style: const TextStyle(color: kPrimary, fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 16),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(children: [
@@ -55,74 +78,111 @@ class ActivitiesTab extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       label: Text(c), selected: f == c, selectedColor: kPrimary, showCheckmark: false,
-                      labelStyle: TextStyle(color: f == c ? Colors.white : kText),
+                      labelStyle: TextStyle(color: f == c ? Colors.white : kText, fontWeight: FontWeight.w600),
                       onSelected: (_) => activityFilter.value = c,
                     ),
                   ),
               ]),
             ),
-            const SizedBox(height: 14),
-            for (final a in shown)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: () async {
-                    if (!a.free && !await ensureAccess(context)) return;
-                    if (context.mounted) Navigator.push(context, MaterialPageRoute(builder: (_) => ActivityScreen(a)));
-                  },
-                  child: Box(
-                    child: Row(children: [
-                      IconBadge(a.icon, a.color),
-                      const SizedBox(width: 14),
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(a.title, style: const TextStyle(fontWeight: FontWeight.w700, color: kText, fontSize: 16)),
-                        Text('${a.type} · 5 min · ${a.desc}', style: const TextStyle(fontSize: 12, color: kMuted)),
-                      ])),
-                      Icon(a.free ? Icons.play_circle_outline : Icons.chevron_right, color: kMuted),
-                    ]),
-                  ),
-                ),
+            const SizedBox(height: 16),
+            for (var i = 0; i < shown.length; i++)
+              TweenAnimationBuilder<double>(
+                key: ValueKey('$f${shown[i].title}'),
+                tween: Tween(begin: 0, end: 1),
+                duration: Duration(milliseconds: 350 + i * 90),
+                curve: Curves.easeOutCubic,
+                builder: (_, v, child) => Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 28 * (1 - v)), child: child)),
+                child: _Card(shown[i], () => _open(context, shown[i])),
               ),
           ]);
         },
       );
 }
 
-class ActivityScreen extends StatefulWidget {
+class _Card extends StatelessWidget {
   final Activity a;
-  const ActivityScreen(this.a, {super.key});
+  final VoidCallback onTap;
+  const _Card(this.a, this.onTap);
   @override
-  State<ActivityScreen> createState() => _ActivityScreenState();
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 14),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Container(
+            decoration: BoxDecoration(gradient: LinearGradient(colors: [a.color, Color.lerp(a.color, Colors.black, .25)!], begin: Alignment.topLeft, end: Alignment.bottomRight)),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onTap,
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Row(children: [
+                    Container(width: 54, height: 54, decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle), child: Icon(a.icon, color: Colors.white, size: 28)),
+                    const SizedBox(width: 16),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(a.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
+                      const SizedBox(height: 3),
+                      Text(a.desc, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                      const SizedBox(height: 8),
+                      Text('${a.type.toUpperCase()}  ·  5 MIN', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                    ])),
+                    const Icon(Icons.play_circle_fill, color: Colors.white, size: 36),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
-class _ActivityScreenState extends State<ActivityScreen> with SingleTickerProviderStateMixin {
-  late final AnimationController pulse = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat(reverse: true);
-  Timer? timer;
-  int left = 300;
+class ActivityRunner extends StatefulWidget {
+  final Activity a;
+  const ActivityRunner(this.a, {super.key});
+  @override
+  State<ActivityRunner> createState() => _ActivityRunnerState();
+}
 
-  void _toggle() {
-    if (timer != null) {
-      timer!.cancel();
-      setState(() => timer = null);
-      return;
-    }
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (left <= 1) {
-        t.cancel();
-        setState(() { left = 0; timer = null; });
-        return;
-      }
+class _ActivityRunnerState extends State<ActivityRunner> {
+  static const total = 300;
+  int left = total;
+  bool done = false;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() => left--);
+      if (left <= 0) _finish();
     });
-    setState(() {});
+  }
+
+  void _finish() {
+    if (done) return;
+    timer?.cancel();
+    final secs = total - left;
+    minutesToday.value += (secs / 60).ceil().clamp(1, 5);
+    DbService.logActivity(widget.a.title, secs).catchError((_) {});
+    setState(() => done = true);
   }
 
   @override
   void dispose() {
     timer?.cancel();
-    pulse.dispose();
     super.dispose();
+  }
+
+  Widget _player() {
+    final a = widget.a;
+    switch (a.kind) {
+      case Kind.breathe: return const BreathePlayer();
+      case Kind.bubbles: return const BubblesPlayer();
+      case Kind.stretch: return const StretchPlayer();
+      case Kind.ground: return GroundPlayer(onDone: _finish);
+      case Kind.affirm: return AffirmPlayer(items: a.items, onDone: _finish);
+      case Kind.scene: return const ScenePlayer();
+    }
   }
 
   @override
@@ -130,33 +190,57 @@ class _ActivityScreenState extends State<ActivityScreen> with SingleTickerProvid
     final a = widget.a;
     final mm = '${left ~/ 60}:${(left % 60).toString().padLeft(2, '0')}';
     return Scaffold(
-      appBar: AppBar(title: Text(a.title)),
-      body: ListView(padding: const EdgeInsets.all(24), children: [
-        Center(
-          child: ScaleTransition(
-            scale: Tween(begin: .8, end: 1.0).animate(CurvedAnimation(parent: pulse, curve: Curves.easeInOut)),
-            child: Container(
-              width: 190, height: 190, alignment: Alignment.center,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: a.color.withOpacity(.2),
-                  border: Border.all(color: a.color, width: 3)),
-              child: Text(left == 0 ? 'Well done' : mm, style: kTitle.copyWith(fontSize: 38, color: a.color)),
+      body: Container(
+        decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [a.color, Color.lerp(a.color, Colors.black, .4)!])),
+        child: SafeArea(
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 20, 0),
+              child: Row(children: [
+                IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: () => Navigator.pop(context)),
+                Expanded(child: Text(a.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16))),
+                Text(done ? '' : mm, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600)),
+              ]),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: LinearProgressIndicator(value: (total - left) / total, minHeight: 5, color: Colors.white, backgroundColor: Colors.white24, borderRadius: BorderRadius.circular(3)),
+            ),
+            Expanded(
+              child: AnimatedSwitcher(duration: const Duration(milliseconds: 500), child: done ? _Done(a, total - left) : _player()),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: done
+                  ? FilledButton(style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: a.color, minimumSize: const Size(220, 50)),
+                      onPressed: () => Navigator.pop(context), child: const Text('Back to Take 5'))
+                  : TextButton(onPressed: _finish, child: const Text("I'm done early", style: TextStyle(color: Colors.white70))),
+            ),
+          ]),
         ),
-        const SizedBox(height: 28),
-        for (var i = 0; i < a.steps.length; i++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Box(child: Row(children: [
-              CircleAvatar(radius: 13, backgroundColor: a.color, child: Text('${i + 1}', style: const TextStyle(color: Colors.white, fontSize: 12))),
-              const SizedBox(width: 12),
-              Expanded(child: Text(a.steps[i], style: const TextStyle(color: kText))),
-            ])),
-          ),
-        const SizedBox(height: 14),
-        PrimaryButton(timer != null ? 'Pause' : left == 300 ? 'Start 5 minutes' : left == 0 ? 'Finish' : 'Resume',
-            onTap: left == 0 ? () => Navigator.pop(context) : _toggle),
-      ]),
+      ),
     );
   }
+}
+
+class _Done extends StatelessWidget {
+  final Activity a;
+  final int secs;
+  const _Done(this.a, this.secs);
+  @override
+  Widget build(BuildContext context) => Center(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1), duration: const Duration(milliseconds: 900), curve: Curves.elasticOut,
+          builder: (_, v, __) => Transform.scale(
+            scale: v,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(width: 110, height: 110, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: Icon(Icons.check, size: 64, color: a.color)),
+              const SizedBox(height: 24),
+              const Text('Nice work 💚', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Text('You gave yourself ${(secs / 60).ceil().clamp(1, 5)} min of calm.', style: const TextStyle(color: Colors.white70)),
+            ]),
+          ),
+        ),
+      );
 }
