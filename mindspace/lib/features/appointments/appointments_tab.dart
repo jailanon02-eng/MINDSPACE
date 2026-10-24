@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../all.dart';
 
+
 class AppointmentsTab extends StatefulWidget {
   const AppointmentsTab({super.key});
   @override
@@ -10,67 +11,65 @@ class AppointmentsTab extends StatefulWidget {
 class _AppointmentsTabState extends State<AppointmentsTab> {
   bool upcoming = true;
 
-  Widget _seg(String t, bool on) => Expanded(
-        child: GestureDetector(
-          onTap: () => setState(() => upcoming = on),
-          child: Container(
-            height: 40, alignment: Alignment.center,
-            decoration: BoxDecoration(color: upcoming == on ? kPrimary : const Color(0xFFE9E7F7), borderRadius: BorderRadius.circular(10)),
-            child: Text(t, style: TextStyle(color: upcoming == on ? Colors.white : kMuted, fontWeight: FontWeight.w600)),
-          ),
-        ),
-      );
-
   @override
   Widget build(BuildContext context) => StreamBuilder<List<Appt>>(
         stream: DbService.appointments(),
         builder: (_, snap) {
-          final list = snap.data ?? <Appt>[];
-          final today = DateTime.now();
-          final shown = list.where((a) => upcoming == (!a.date.isBefore(DateTime(today.year, today.month, today.day)))).toList();
+          final n = DateTime.now(), today = DateTime(n.year, n.month, n.day);
+          final shown = (snap.data ?? <Appt>[]).where((a) => upcoming == !a.date.isBefore(today)).toList();
           return ListView(padding: const EdgeInsets.all(20), children: [
-            const Text('My Appointments', style: kTitle),
+            Text('Your sessions', style: kTitle.copyWith(fontSize: 28)),
             const SizedBox(height: 16),
-            Row(children: [_seg('Upcoming', true), const SizedBox(width: 12), _seg('Past', false)]),
+            SizedBox(
+              width: double.infinity,
+              child: SegmentedButton<bool>(
+                showSelectedIcon: false,
+                segments: const [ButtonSegment(value: true, label: Text('Upcoming')), ButtonSegment(value: false, label: Text('Past'))],
+                selected: {upcoming},
+                onSelectionChanged: (s) => setState(() => upcoming = s.first),
+              ),
+            ),
             const SizedBox(height: 16),
+            if (shown.isEmpty)
+              Box(
+                padding: const EdgeInsets.all(28),
+                child: Column(children: [
+                  const Icon(Icons.spa_outlined, size: 44, color: kPrimary),
+                  const SizedBox(height: 12),
+                  Text(upcoming ? 'No sessions booked yet' : 'No past sessions', style: const TextStyle(fontWeight: FontWeight.w700, color: kText)),
+                  const SizedBox(height: 4),
+                  const Text('Talking to someone can help.', style: TextStyle(color: kMuted)),
+                  if (upcoming) ...[
+                    const SizedBox(height: 16),
+                    PrimaryButton('Book a session',
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookScreen()))),
+                  ],
+                ]),
+              ),
             for (final a in shown)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Box(
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const IconBadge(Icons.person, Colors.teal),
-                    const SizedBox(width: 12),
+                  child: Row(children: [
+                    Container(
+                      width: 56, height: 64,
+                      decoration: BoxDecoration(color: kPrimary.withOpacity(.12), borderRadius: BorderRadius.circular(14)),
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text('${a.date.day}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kPrimary)),
+                        Text(months[a.date.month - 1].substring(0, 3).toUpperCase(), style: const TextStyle(fontSize: 11, color: kPrimary)),
+                      ]),
+                    ),
+                    const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(a.service, style: const TextStyle(fontWeight: FontWeight.w700, color: kText)),
-                      Text(fmtDate(a.date), style: const TextStyle(fontSize: 12, color: kMuted)),
-                      Row(children: [const Icon(Icons.access_time, size: 14, color: kPrimary), const SizedBox(width: 4),
-                        Text(a.time, style: const TextStyle(fontSize: 12, color: kMuted))]),
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                        decoration: BoxDecoration(color: const Color(0xFFD7F5E8), borderRadius: BorderRadius.circular(10)),
-                        child: Text(upcoming ? 'Upcoming' : 'Completed', style: const TextStyle(fontSize: 11, color: Colors.green)),
-                      ),
+                      const SizedBox(height: 4),
+                      Row(children: [const Icon(Icons.schedule, size: 14, color: kMuted), const SizedBox(width: 4),
+                        Text(a.time, style: const TextStyle(color: kMuted, fontSize: 13))]),
                     ])),
-                    PopupMenuButton<String>(
-                      onSelected: (_) => DbService.cancel(a.id),
-                      itemBuilder: (_) => const [PopupMenuItem(value: 'cancel', child: Text('Cancel appointment'))],
-                    ),
+                    if (upcoming) IconButton(tooltip: 'Cancel', icon: const Icon(Icons.close, color: kMuted), onPressed: () => DbService.cancel(a.id)),
                   ]),
                 ),
               ),
-            Box(
-              color: const Color(0xFFEDEBFA),
-              child: Column(children: [
-                const Icon(Icons.event, size: 32, color: kPrimary),
-                const SizedBox(height: 8),
-                Text(shown.isEmpty ? 'No appointments yet.\nBook one to get started!' : 'No more appointments.\nBook a new one to get started!',
-                    textAlign: TextAlign.center, style: const TextStyle(color: kMuted)),
-                const SizedBox(height: 12),
-                PrimaryButton('Book Appointment',
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BookScreen()))),
-              ]),
-            ),
           ]);
         },
       );

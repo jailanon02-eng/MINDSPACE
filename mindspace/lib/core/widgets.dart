@@ -35,7 +35,8 @@ class Box extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: selected ? kPrimary : const Color(0xFFE6E4F5), width: selected ? 1.5 : 1),
+          border: Border.all(color: selected ? kPrimary : Colors.transparent, width: 1.5),
+          boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 14, offset: Offset(0, 4))],
         ),
         child: child,
       );

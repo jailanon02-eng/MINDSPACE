@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../all.dart';
 
+
 class BookScreen extends StatefulWidget {
   const BookScreen({super.key});
   @override
@@ -10,38 +11,34 @@ class BookScreen extends StatefulWidget {
 class _BookScreenState extends State<BookScreen> {
   int step = 0, service = 0;
   DateTime date = DateTime.now();
-  String? time = '09:00 AM';
+  String time = '09:00 AM';
+  bool saving = false;
   static const services = [
-    ('General Counseling', 'Talk to a licensed counselor', Icons.person, Colors.blue),
-    ('Stress Management', 'Learn coping techniques', Icons.spa, Colors.orange),
-    ('Anxiety Support', 'Help for anxiety-related issues', Icons.healing, Colors.redAccent),
-    ('Student Wellness', 'For students and young adults', Icons.school, Colors.teal),
+    ('General Counseling', 'Talk with a licensed counselor', Icons.chat_bubble_outline),
+    ('Anxiety Support', 'Tools for worry and panic', Icons.waves),
+    ('Burnout & Stress', 'Coping skills and planning', Icons.local_fire_department_outlined),
+    ('Food & Body Image', 'Gentle, judgment-free support', Icons.restaurant_outlined),
+    ('Low Mood', 'Support for depression', Icons.cloud_outlined),
   ];
   static const times = ['09:00 AM', '10:00 AM', '11:00 AM', '01:00 PM', '02:30 PM', '04:00 PM'];
-  static const heads = ['Book an Appointment', 'Select Date', 'Select Time', 'Confirm'];
+  static const heads = ['Choose a service', 'Pick a day', 'Pick a time', 'Review and confirm'];
 
-  Future<void> next() async {
-    if (step < 3) {
-      setState(() => step++);
-    } else {
-      await DbService.addAppointment(Appt(services[service].$1, date, time!));
-      if (!mounted) return;
-      currentTab.value = 1;
-      Navigator.pop(context);
-    }
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      if (!await ensureAccess(context) && mounted) Navigator.pop(context);
+    });
   }
 
-  Widget _stepper() => Row(children: [
-        for (var i = 0; i < 4; i++) ...[
-          Column(children: [
-            CircleAvatar(radius: 14, backgroundColor: i <= step ? kPrimary : const Color(0xFFE3E1F5),
-                child: Text('${i + 1}', style: TextStyle(fontSize: 12, color: i <= step ? Colors.white : kMuted))),
-            const SizedBox(height: 4),
-            Text(['Service', 'Date', 'Time', 'Confirm'][i], style: const TextStyle(fontSize: 11, color: kMuted)),
-          ]),
-          if (i < 3) Expanded(child: Container(height: 2, margin: const EdgeInsets.only(bottom: 16), color: const Color(0xFFE3E1F5))),
-        ]
-      ]);
+  Future<void> _next() async {
+    if (step < 3) return setState(() => step++);
+    setState(() => saving = true);
+    await DbService.addAppointment(Appt(services[service].$1, date, time));
+    if (!mounted) return;
+    currentTab.value = 2;
+    Navigator.pop(context);
+  }
 
   Widget _body() {
     switch (step) {
@@ -51,17 +48,18 @@ class _BookScreenState extends State<BookScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: InkWell(
+                borderRadius: BorderRadius.circular(16),
                 onTap: () => setState(() => service = i),
                 child: Box(
                   selected: service == i,
                   child: Row(children: [
-                    IconBadge(services[i].$3, services[i].$4),
-                    const SizedBox(width: 12),
+                    IconBadge(services[i].$3, kPrimary),
+                    const SizedBox(width: 14),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(services[i].$1, style: const TextStyle(fontWeight: FontWeight.w700, color: kText)),
                       Text(services[i].$2, style: const TextStyle(fontSize: 12, color: kMuted)),
                     ])),
-                    Icon(service == i ? Icons.radio_button_checked : Icons.radio_button_off, color: service == i ? kPrimary : kMuted),
+                    if (service == i) const Icon(Icons.check_circle, color: kPrimary),
                   ]),
                 ),
               ),
@@ -70,40 +68,32 @@ class _BookScreenState extends State<BookScreen> {
       case 1:
         return Box(
           child: CalendarDatePicker(
-            initialDate: date.isBefore(DateTime.now()) ? DateTime.now() : date,
-            firstDate: DateTime.now().subtract(const Duration(days: 0)),
-            lastDate: DateTime.now().add(const Duration(days: 365)),
+            initialDate: date, firstDate: DateTime.now(), lastDate: DateTime.now().add(const Duration(days: 365)),
             onDateChanged: (d) => date = d,
           ),
         );
       case 2:
-        return Column(children: [
+        return Wrap(spacing: 10, runSpacing: 10, children: [
           for (final t in times)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: InkWell(
-                onTap: () => setState(() => time = t),
-                child: Box(
-                  selected: time == t,
-                  color: time == t ? const Color(0xFFE9E6FA) : Colors.white,
-                  child: Row(children: [
-                    Expanded(child: Text(t, style: const TextStyle(fontWeight: FontWeight.w600, color: kText))),
-                    if (time == t) const Icon(Icons.check_circle, color: kPrimary),
-                  ]),
-                ),
-              ),
+            ChoiceChip(
+              label: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), child: Text(t)),
+              selected: time == t, selectedColor: kPrimary, showCheckmark: false,
+              labelStyle: TextStyle(color: time == t ? Colors.white : kText, fontWeight: FontWeight.w600),
+              onSelected: (_) => setState(() => time = t),
             ),
         ]);
       default:
         return Box(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Summary', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: kText)),
-            const SizedBox(height: 12),
-            Text('Service: ${services[service].$1}'),
-            const SizedBox(height: 6),
-            Text('Date: ${fmtDate(date)}'),
-            const SizedBox(height: 6),
-            Text('Time: $time'),
+          child: Column(children: [
+            for (final r in [('Service', services[service].$1), ('Date', fmtDate(date)), ('Time', time)])
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(children: [
+                  Text(r.$1, style: const TextStyle(color: kMuted)),
+                  const Spacer(),
+                  Text(r.$2, style: const TextStyle(fontWeight: FontWeight.w700, color: kText)),
+                ]),
+              ),
           ]),
         );
     }
@@ -112,6 +102,7 @@ class _BookScreenState extends State<BookScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          title: Text('Step ${step + 1} of 4', style: const TextStyle(fontSize: 14, color: kMuted)),
           leading: IconButton(icon: const Icon(Icons.arrow_back),
               onPressed: () => step == 0 ? Navigator.pop(context) : setState(() => step--)),
         ),
@@ -119,20 +110,22 @@ class _BookScreenState extends State<BookScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
             child: Column(children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: LinearProgressIndicator(value: (step + 1) / 4, minHeight: 6, color: kPrimary,
+                    backgroundColor: kPrimary.withOpacity(.15), borderRadius: BorderRadius.circular(3)),
+              ),
               Expanded(
-                child: ListView(padding: const EdgeInsets.symmetric(horizontal: 20), children: [
-                  Text(heads[step], style: kTitle),
-                  const SizedBox(height: 4),
-                  const Text('Select a service and choose a date and time.', style: TextStyle(color: kMuted, fontSize: 13)),
+                child: ListView(padding: const EdgeInsets.all(24), children: [
+                  Text(heads[step], style: kTitle.copyWith(fontSize: 26)),
                   const SizedBox(height: 18),
-                  _stepper(),
-                  const SizedBox(height: 20),
                   _body(),
                 ]),
               ),
               Padding(
-                padding: const EdgeInsets.all(20),
-                child: PrimaryButton(step == 3 ? 'Confirm Appointment' : step == 0 ? 'Next' : 'Continue', arrow: true, onTap: next),
+                padding: const EdgeInsets.all(24),
+                child: PrimaryButton(saving ? 'Booking...' : step == 3 ? 'Confirm booking' : 'Continue', arrow: step < 3,
+                    onTap: saving ? null : _next),
               ),
             ]),
           ),
