@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../all.dart';
 
+
 class MoodScreen extends StatefulWidget {
   const MoodScreen({super.key});
   @override
@@ -9,64 +10,60 @@ class MoodScreen extends StatefulWidget {
 
 class _MoodScreenState extends State<MoodScreen> {
   int? sel;
+  bool busy = false;
   final ctrl = TextEditingController();
-  static const moods = [
-    ('Great', Icons.sentiment_very_satisfied, Colors.green),
-    ('Good', Icons.sentiment_satisfied, Color(0xFF8BC34A)),
-    ('Okay', Icons.sentiment_neutral, Colors.amber),
-    ('Sad', Icons.sentiment_dissatisfied, Colors.lightBlue),
-    ('Anxious', Icons.sentiment_very_dissatisfied, Colors.deepPurpleAccent),
-    ('Stressed', Icons.mood_bad, Colors.redAccent),
-  ];
+  static const moods = [('Great', '😄'), ('Good', '🙂'), ('Okay', '😐'), ('Sad', '😢'), ('Anxious', '😰'), ('Stressed', '😣')];
+
+  Future<void> _submit() async {
+    setState(() => busy = true);
+    await DbService.addMood(moods[sel!].$1, ctrl.text.trim());
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thanks for checking in 💚')));
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(children: [
-            const Text('How are you\nfeeling today?', textAlign: TextAlign.center, style: kTitle),
-            const SizedBox(height: 10),
-            const Text('Choose a mood (anonymous)', style: TextStyle(color: kMuted)),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 28, runSpacing: 20, alignment: WrapAlignment.center,
-              children: [
-                for (var i = 0; i < moods.length; i++)
-                  GestureDetector(
-                    onTap: () => setState(() => sel = i),
-                    child: Column(children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(shape: BoxShape.circle,
-                            border: Border.all(color: sel == i ? kPrimary : Colors.transparent, width: 3)),
-                        child: CircleAvatar(radius: 32, backgroundColor: moods[i].$3.withOpacity(.25),
-                            child: Icon(moods[i].$2, size: 44, color: moods[i].$3)),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: ListView(padding: const EdgeInsets.all(24), children: [
+              Text('How are you feeling right now?', style: kTitle.copyWith(fontSize: 28)),
+              const SizedBox(height: 6),
+              const Text('Only you can see this. There are no wrong answers.', style: TextStyle(color: kMuted)),
+              const SizedBox(height: 24),
+              GridView.count(
+                crossAxisCount: 3, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12, crossAxisSpacing: 12,
+                children: [
+                  for (var i = 0; i < moods.length; i++)
+                    GestureDetector(
+                      onTap: () => setState(() => sel = i),
+                      child: AnimatedScale(
+                        scale: sel == i ? 1.05 : 1, duration: const Duration(milliseconds: 150),
+                        child: Box(
+                          selected: sel == i,
+                          color: sel == i ? kPrimary.withOpacity(.1) : Colors.white,
+                          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                            Text(moods[i].$2, style: const TextStyle(fontSize: 38)),
+                            const SizedBox(height: 6),
+                            Text(moods[i].$1, style: const TextStyle(fontWeight: FontWeight.w600, color: kText)),
+                          ]),
+                        ),
                       ),
-                      const SizedBox(height: 6),
-                      Text(moods[i].$1, style: const TextStyle(fontSize: 12, color: kText)),
-                    ]),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            const Align(alignment: Alignment.centerLeft, child: Text('Optional: You can write something...', style: TextStyle(color: kText))),
-            const SizedBox(height: 8),
-            TextField(
-              controller: ctrl, maxLines: 4, maxLength: 200,
-              decoration: InputDecoration(
-                hintText: 'Type here...', filled: true, fillColor: Colors.white,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                ],
               ),
-            ),
-            const SizedBox(height: 12),
-            PrimaryButton('Submit Check-in', onTap: sel == null ? null : () async {
-              await DbService.addMood(moods[sel!].$1, ctrl.text.trim());
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Thanks for checking in 💜')));
-              Navigator.pop(context);
-            }),
-          ]),
+              const SizedBox(height: 24),
+              TextField(
+                controller: ctrl, maxLines: 4, maxLength: 200,
+                decoration: fieldDec('Anything you want to add? (optional)', Icons.edit_note),
+              ),
+              const SizedBox(height: 12),
+              PrimaryButton(busy ? 'Saving...' : 'Save check-in', onTap: sel == null || busy ? null : _submit),
+            ]),
+          ),
         ),
       );
 }
