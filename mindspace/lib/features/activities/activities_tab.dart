@@ -6,10 +6,10 @@ import '../../all.dart';
 final activityFilter = ValueNotifier<String>('All');
 final minutesToday = ValueNotifier<int>(0);
 
-const kTypes = ['Read', 'Play', 'Watch', 'Move', 'Breathe'];
+const kTypes = ['Read', 'Write', 'Play', 'Watch', 'Move', 'Breathe'];
 const kFocus = ['Anxiety', 'Stress', 'Eating', 'Depression'];
 
-enum Kind { breathe, bubbles, stretch, ground, affirm, scene }
+enum Kind { breathe, bubbles, stretch, ground, affirm, scene, worry, gratitude, squeeze, doodle, bodyscan }
 
 class Activity {
   final String title, desc, type;
@@ -33,6 +33,11 @@ const activities = [
     'My body deserves care, not punishment.', 'Food is fuel and comfort, not a test.', 'My worth is not measured by what I eat.',
     'It is okay to take up space.', 'Every meal is a chance to be kind to myself.', 'I am more than how I look.']),
   Activity('Ocean ripples', 'Touch the water and unwind', 'Watch', Icons.waves, Color(0xFF2F7DA6), Kind.scene, ['Stress', 'Depression', 'Anxiety']),
+  Activity('Worry release', 'Write it, then watch it float away', 'Write', Icons.cloud_upload_outlined, Color(0xFF5B7FA6), Kind.worry, ['Anxiety', 'Stress']),
+  Activity('Gratitude jar', 'Fill a jar with three small good things', 'Write', Icons.local_drink_outlined, Color(0xFFD89B2B), Kind.gratitude, ['Depression', 'Eating']),
+  Activity('Squeeze and release', 'Tense, hold, then let go', 'Move', Icons.fitness_center, Color(0xFFB0609A), Kind.squeeze, ['Anxiety', 'Stress']),
+  Activity('Calm doodle', 'Draw with soft, glowing color', 'Play', Icons.brush, Color(0xFFD9656F), Kind.doodle, ['Stress', 'Depression', 'Eating']),
+  Activity('Body scan', 'A slow, guided wind-down', 'Breathe', Icons.nights_stay_outlined, Color(0xFF3D6FA3), Kind.bodyscan, ['Anxiety', 'Stress']),
 ];
 
 class ActivitiesTab extends StatelessWidget {
@@ -182,6 +187,11 @@ class _ActivityRunnerState extends State<ActivityRunner> {
       case Kind.ground: return GroundPlayer(onDone: _finish);
       case Kind.affirm: return AffirmPlayer(items: a.items, onDone: _finish);
       case Kind.scene: return const ScenePlayer();
+      case Kind.worry: return WorryPlayer(onDone: _finish);
+      case Kind.gratitude: return GratitudePlayer(onDone: _finish);
+      case Kind.squeeze: return SqueezePlayer(onDone: _finish);
+      case Kind.doodle: return const DoodlePlayer();
+      case Kind.bodyscan: return BodyScanPlayer(onDone: _finish);
     }
   }
 
