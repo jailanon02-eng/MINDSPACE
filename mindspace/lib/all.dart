@@ -18,3 +18,7 @@ export 'features/appointments/appointments_tab.dart';
 export 'features/activities/activities_tab.dart';
 export 'features/profile/profile_tab.dart';
 export 'features/activities/activity_players.dart';
+export 'services/social_service.dart';
+export 'features/profile/edit_profile_screen.dart';
+export 'features/social/my_day_screen.dart';
+export 'features/social/friends_screen.dart';
