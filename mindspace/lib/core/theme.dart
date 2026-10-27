@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 
-// Brand Colors
 const kPrimary = Color(0xFF3F8F8A);
 const kAccent = Color(0xFFF2A97B);
 const kBg = Color(0xFFF3F8F6);
 const kText = Color(0xFF1F3B3A);
 const kMuted = Color(0xFF6B8280);
 
-// Global Navigation State
+/// Philippine mental health crisis lines shown in the "Need urgent help?" dialog.
+const kCrisisInfo =
+    'If you are in danger or thinking about hurting yourself, call your local emergency number now.\n\n'
+    'National Center for Mental Health (NCMH):\n'
+    '• 1553 (Luzon Toll-Free Landline)\n'
+    '• 1800-1888-1553\n'
+    '• 0917-899-8727 / 0966-351-4518 (Globe/TM)\n'
+    '• 0919-057-1553 (Smart/TNT)\n\n'
+    'In Touch Community Services:\n'
+    '• (02) 8893-7603 | 0917-800-1123\n\n'
+    'Hopeline Philippines:\n'
+    '• 0917-558-4673 | 2919 (Smart Toll-Free)';
+
 final currentTab = ValueNotifier<int>(
   0,
 ); // 0 Home, 1 Activities, 2 Appointments, 3 Profile
 
-// Crisis Hotline Model & Configuration
-class CrisisInfo {
-  final String name;
-  final String number;
-  const CrisisInfo({required this.name, required this.number});
-}
-
-const List<CrisisInfo> kCrisisInfo = [
-  CrisisInfo(name: 'NCMH Crisis Hotline (Philippines)', number: '1553'),
-  CrisisInfo(name: 'Hopeline Philippines', number: '2919'),
-  CrisisInfo(name: 'Emergency Services', number: '911'),
-];
-
-// Helper Utilities
 const months = [
   'January',
   'February',

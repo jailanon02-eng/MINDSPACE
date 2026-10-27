@@ -1,3 +1,11 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+  "java.autobuild.enabled": false,
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": false,
+  "java.configuration.updateBuildConfiguration": "disabled",
+  "java.import.exclusions": ["**/android/**"],
+  "files.watcherExclude": {
+    "**/android/.gradle/**": true,
+    "**/build/**": true
+  }
 }
