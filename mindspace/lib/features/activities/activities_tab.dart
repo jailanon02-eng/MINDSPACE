@@ -48,8 +48,8 @@ class ActivitiesTab extends StatelessWidget {
     if (!c.mounted) return;
     Navigator.push(c, PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 450),
-      pageBuilder: (_, __, ___) => ActivityRunner(a),
-      transitionsBuilder: (_, anim, __, child) => FadeTransition(
+      pageBuilder: (_, _, _) => ActivityRunner(a),
+      transitionsBuilder: (_, anim, _, child) => FadeTransition(
           opacity: anim, child: ScaleTransition(scale: Tween(begin: .94, end: 1.0).animate(CurvedAnimation(parent: anim, curve: Curves.easeOutCubic)), child: child)),
     ));
   }
@@ -57,7 +57,7 @@ class ActivitiesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<String>(
         valueListenable: activityFilter,
-        builder: (_, f, __) {
+        builder: (_, f, _) {
           final shown = activities.where((a) => f == 'All' || a.type == f || a.focus.contains(f)).toList();
           return ListView(padding: const EdgeInsets.all(20), children: [
             Row(children: [
@@ -67,9 +67,9 @@ class ActivitiesTab extends StatelessWidget {
               ])),
               ValueListenableBuilder<int>(
                 valueListenable: minutesToday,
-                builder: (_, m, __) => Container(
+                builder: (_, m, _) => Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  decoration: BoxDecoration(color: kPrimary.withOpacity(.12), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: kPrimary.withValues(alpha: .12), borderRadius: BorderRadius.circular(20)),
                   child: Text('🌱 $m min today', style: const TextStyle(color: kPrimary, fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -241,7 +241,7 @@ class _Done extends StatelessWidget {
   Widget build(BuildContext context) => Center(
         child: TweenAnimationBuilder<double>(
           tween: Tween(begin: 0, end: 1), duration: const Duration(milliseconds: 900), curve: Curves.elasticOut,
-          builder: (_, v, __) => Transform.scale(
+          builder: (_, v, _) => Transform.scale(
             scale: v,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(width: 110, height: 110, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: Icon(Icons.check, size: 64, color: a.color)),

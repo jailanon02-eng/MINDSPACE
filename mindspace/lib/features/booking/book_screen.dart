@@ -113,7 +113,7 @@ class _BookScreenState extends State<BookScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: LinearProgressIndicator(value: (step + 1) / 4, minHeight: 6, color: kPrimary,
-                    backgroundColor: kPrimary.withOpacity(.15), borderRadius: BorderRadius.circular(3)),
+                    backgroundColor: kPrimary.withValues(alpha: .15), borderRadius: BorderRadius.circular(3)),
               ),
               Expanded(
                 child: ListView(padding: const EdgeInsets.all(24), children: [

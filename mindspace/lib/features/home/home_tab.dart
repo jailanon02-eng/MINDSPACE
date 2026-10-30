@@ -67,7 +67,7 @@ class HomeTab extends StatelessWidget {
               onTap: () => _open(f.$1),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(color: f.$3.withOpacity(.14), borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(color: f.$3.withValues(alpha: .14), borderRadius: BorderRadius.circular(16)),
                 child: Row(children: [
                   Icon(f.$2, color: f.$3),
                   const SizedBox(width: 8),

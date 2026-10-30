@@ -83,7 +83,7 @@ class _ArtPainter extends CustomPainter {
         Offset(r.nextDouble() * s.width, r.nextDouble() * s.height),
         30 + r.nextDouble() * s.width * .28,
         Paint()
-          ..color = Colors.white.withOpacity(.12 + r.nextDouble() * .2)
+          ..color = Colors.white.withValues(alpha: .12 + r.nextDouble() * .2)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 24),
       );
     }
@@ -101,7 +101,7 @@ class _ArtPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 3
-          ..color = Colors.white.withOpacity(.28),
+          ..color = Colors.white.withValues(alpha: .28),
       );
     }
   }
@@ -117,8 +117,9 @@ class MyDayScreen extends StatelessWidget {
     stream: DbService.profile(),
     builder: (_, s) {
       final p = s.data;
-      if (p == null)
+      if (p == null) {
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
       return DefaultTabController(
         length: 2,
         child: Scaffold(
@@ -193,7 +194,7 @@ class _CreateState extends State<_Create> {
             ChoiceChip(
               label: Text('${e.value.$1} ${e.key}'),
               selected: mood == e.key,
-              selectedColor: kPrimary.withOpacity(.2),
+              selectedColor: kPrimary.withValues(alpha: .2),
               onSelected: (_) => setState(() => mood = e.key),
             ),
         ],
@@ -287,7 +288,7 @@ class _Feed extends StatelessWidget {
   const _Feed(this.p);
   @override
   Widget build(BuildContext context) {
-    if (p.isMinor)
+    if (p.isMinor) {
       return const Center(
         child: Padding(
           padding: EdgeInsets.all(32),
@@ -298,17 +299,19 @@ class _Feed extends StatelessWidget {
           ),
         ),
       );
+    }
     return StreamBuilder<List<Doc>>(
       stream: SocialService.sharedWithMe(),
       builder: (_, s) {
         final docs = s.data ?? <Doc>[];
-        if (docs.isEmpty)
+        if (docs.isEmpty) {
           return const Center(
             child: Text(
               'Nothing shared yet. Add friends to see their days.',
               style: TextStyle(color: kMuted),
             ),
           );
+        }
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [
@@ -332,12 +335,13 @@ class _Feed extends StatelessWidget {
                       child: TextButton.icon(
                         onPressed: () async {
                           await SocialService.report(d.id);
-                          if (context.mounted)
+                          if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Thanks. We will review this.'),
                               ),
                             );
+                          }
                         },
                         icon: const Icon(
                           Icons.flag_outlined,

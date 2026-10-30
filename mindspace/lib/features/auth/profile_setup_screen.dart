@@ -23,8 +23,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     scroll.addListener(() {
       if (!read &&
           scroll.hasClients &&
-          scroll.offset >= scroll.position.maxScrollExtent - 12)
+          scroll.offset >= scroll.position.maxScrollExtent - 12) {
         setState(() => read = true);
+      }
     });
   }
 

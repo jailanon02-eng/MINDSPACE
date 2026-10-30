@@ -12,7 +12,7 @@ class MindSpaceApp extends StatelessWidget {
           colorSchemeSeed: kPrimary,
           scaffoldBackgroundColor: kBg,
           navigationBarTheme: NavigationBarThemeData(
-            height: 68, indicatorColor: kPrimary.withOpacity(.14),
+            height: 68, indicatorColor: kPrimary.withValues(alpha: .14),
             labelTextStyle: WidgetStateProperty.all(const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
           ),
           snackBarTheme: SnackBarThemeData(behavior: SnackBarBehavior.floating, backgroundColor: kText,

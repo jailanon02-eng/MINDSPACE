@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(.25), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: .25), shape: BoxShape.circle),
               child: const Icon(Icons.eco, size: 64, color: Colors.white),
             ),
             const SizedBox(height: 22),
