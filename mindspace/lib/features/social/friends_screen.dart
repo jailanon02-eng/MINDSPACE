@@ -18,11 +18,12 @@ class _FriendsState extends State<FriendsScreen> {
 
   Future<void> _search() async {
     final r = await SocialService.search(q.text);
-    if (mounted)
+    if (mounted) {
       setState(() {
         results = r;
         searched = true;
       });
+    }
   }
 
   Future<void> _add(UserProfile me, Map<String, dynamic> r) async {
@@ -65,7 +66,7 @@ class _FriendsState extends State<FriendsScreen> {
       builder: (_, s) {
         final me = s.data;
         if (me == null) return const Center(child: CircularProgressIndicator());
-        if (me.isMinor)
+        if (me.isMinor) {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(32),
@@ -75,6 +76,7 @@ class _FriendsState extends State<FriendsScreen> {
               ),
             ),
           );
+        }
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [

@@ -34,8 +34,9 @@ class SocialService {
     DocumentReference<Map<String, dynamic>>? claim;
     if (username.isNotEmpty && username != old) {
       claim = _db.collection('usernames').doc(username);
-      if ((await tx.get(claim)).exists)
+      if ((await tx.get(claim)).exists) {
         throw Exception('That username is taken.');
+      }
     }
     final photo = photoUrl ?? cur['photoUrl'] ?? '';
     if (claim != null) {

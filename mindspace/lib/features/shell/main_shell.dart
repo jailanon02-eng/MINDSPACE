@@ -8,7 +8,7 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<int>(
         valueListenable: currentTab,
-        builder: (_, i, __) => Scaffold(
+        builder: (_, i, _) => Scaffold(
           body: SafeArea(
             child: Column(children: [
               StreamBuilder<UserProfile?>(
@@ -35,7 +35,7 @@ class MainShell extends StatelessWidget {
             ]),
           ),
           bottomNavigationBar: NavigationBar(
-            backgroundColor: Colors.white, indicatorColor: kPrimary.withOpacity(.15),
+            backgroundColor: Colors.white, indicatorColor: kPrimary.withValues(alpha: .15),
             selectedIndex: i, onDestinationSelected: (v) => currentTab.value = v,
             destinations: const [
               NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home, color: kPrimary), label: 'Home'),

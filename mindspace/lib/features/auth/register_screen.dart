@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../all.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -17,8 +16,9 @@ class _RegisterScreenState extends State<RegisterScreen> with Busy {
 
   Future<void> _submit() async {
     if (!email.text.contains('@')) return _msg('Enter a valid email.');
-    if (pass.text.length < 8)
+    if (pass.text.length < 8) {
       return _msg('Password must be at least 8 characters.');
+    }
     if (pass.text != confirm.text) return _msg('Passwords do not match.');
     await run(() => AuthService.register(email.text.trim(), pass.text));
     if (mounted) Navigator.popUntil(context, (r) => r.isFirst);

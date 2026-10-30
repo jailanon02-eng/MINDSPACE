@@ -49,7 +49,7 @@ class IconBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         width: 40, height: 40,
-        decoration: BoxDecoration(color: color.withOpacity(.18), borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(color: color.withValues(alpha: .18), borderRadius: BorderRadius.circular(10)),
         child: Icon(icon, color: color, size: 22),
       );
 }

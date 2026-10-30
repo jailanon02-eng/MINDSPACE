@@ -123,7 +123,7 @@ class ProfileTab extends StatelessWidget {
                 color: kPrimary,
               ),
               label: Text(status),
-              backgroundColor: kPrimary.withOpacity(.1),
+              backgroundColor: kPrimary.withValues(alpha: .1),
               side: BorderSide.none,
             ),
           ),

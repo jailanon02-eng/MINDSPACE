@@ -53,7 +53,7 @@ class _AppointmentsTabState extends State<AppointmentsTab> {
                   child: Row(children: [
                     Container(
                       width: 56, height: 64,
-                      decoration: BoxDecoration(color: kPrimary.withOpacity(.12), borderRadius: BorderRadius.circular(14)),
+                      decoration: BoxDecoration(color: kPrimary.withValues(alpha: .12), borderRadius: BorderRadius.circular(14)),
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         Text('${a.date.day}', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: kPrimary)),
                         Text(months[a.date.month - 1].substring(0, 3).toUpperCase(), style: const TextStyle(fontSize: 11, color: kPrimary)),

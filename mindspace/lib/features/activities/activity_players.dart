@@ -21,11 +21,11 @@ class _BreatheState extends State<BreathePlayer> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
         animation: c,
-        builder: (_, __) {
+        builder: (_, _) {
           final t = c.value * 4, ph = t.floor() % 4, f = t - t.floor();
           final e = Curves.easeInOut.transform(f);
           final s = ph == 0 ? .55 + .45 * e : ph == 1 ? 1.0 : ph == 2 ? 1 - .45 * e : .55;
-          Widget ring(double size, double o) => Container(width: size * s, height: size * s, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(o)));
+          Widget ring(double size, double o) => Container(width: size * s, height: size * s, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: o)));
           return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             SizedBox(
               width: 280, height: 280,
@@ -111,7 +111,7 @@ class _BubblesState extends State<BubblesPlayer> with SingleTickerProviderStateM
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white70, width: 2),
-                            gradient: RadialGradient(center: const Alignment(-.4, -.4), colors: [Colors.white.withOpacity(.6), Colors.white.withOpacity(.12)]),
+                            gradient: RadialGradient(center: const Alignment(-.4, -.4), colors: [Colors.white.withValues(alpha: .6), Colors.white.withValues(alpha: .12)]),
                           ),
                         ),
                       ),
@@ -161,7 +161,7 @@ class _StretchState extends State<StretchPlayer> with SingleTickerProviderStateM
           child: Column(key: ValueKey(i), children: [
             AnimatedBuilder(
               animation: bounce,
-              builder: (_, __) => Transform.translate(offset: Offset(0, -16 * Curves.easeInOut.transform(bounce.value)), child: Text(moves[i].$1, style: const TextStyle(fontSize: 100))),
+              builder: (_, _) => Transform.translate(offset: Offset(0, -16 * Curves.easeInOut.transform(bounce.value)), child: Text(moves[i].$1, style: const TextStyle(fontSize: 100))),
             ),
             const SizedBox(height: 14),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -262,7 +262,7 @@ class _AffirmState extends State<AffirmPlayer> {
               scale: i == page ? 1 : .92, duration: const Duration(milliseconds: 250),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 28), padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(color: Colors.white.withOpacity(.18), borderRadius: BorderRadius.circular(32), border: Border.all(color: Colors.white30)),
+                decoration: BoxDecoration(color: Colors.white.withValues(alpha: .18), borderRadius: BorderRadius.circular(32), border: Border.all(color: Colors.white30)),
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Text(widget.items[i], textAlign: TextAlign.center, style: _white.copyWith(fontSize: 26, fontWeight: FontWeight.w700, height: 1.3)),
                   const SizedBox(height: 28),
@@ -320,7 +320,7 @@ class _SceneState extends State<ScenePlayer> with SingleTickerProviderStateMixin
           },
           child: AnimatedBuilder(
             animation: c,
-            builder: (_, __) => CustomPaint(size: Size.infinite, painter: _ScenePainter(now, List.of(ripples))),
+            builder: (_, _) => CustomPaint(size: Size.infinite, painter: _ScenePainter(now, List.of(ripples))),
           ),
         ),
         Align(alignment: Alignment.topCenter, child: IgnorePointer(child: Padding(padding: const EdgeInsets.only(top: 8), child: Text('Touch the water. Let thoughts drift by.', style: _white.copyWith(color: Colors.white70))))),
@@ -336,7 +336,7 @@ class _ScenePainter extends CustomPainter {
   void paint(Canvas cv, Size s) {
     final star = Paint();
     for (var i = 0; i < 18; i++) {
-      star.color = Colors.white.withOpacity(.25 + .35 * (math.sin(t * 1.2 + i) * .5 + .5));
+      star.color = Colors.white.withValues(alpha: .25 + .35 * (math.sin(t * 1.2 + i) * .5 + .5));
       cv.drawCircle(Offset((i * 73 % 100) / 100 * s.width, (i * 37 % 50) / 100 * s.height), 1.5 + (i % 3), star);
     }
     for (var k = 0; k < 3; k++) {
@@ -346,12 +346,12 @@ class _ScenePainter extends CustomPainter {
         path.lineTo(x, y);
       }
       path..lineTo(s.width, s.height)..close();
-      cv.drawPath(path, Paint()..color = Colors.white.withOpacity(.12 + .08 * k));
+      cv.drawPath(path, Paint()..color = Colors.white.withValues(alpha: .12 + .08 * k));
     }
     for (final r in ripples) {
       final age = t - r.t;
       if (age > 3) continue;
-      cv.drawCircle(r.p, age * 90, Paint()..style = PaintingStyle.stroke..strokeWidth = 3..color = Colors.white.withOpacity((1 - age / 3) * .7));
+      cv.drawCircle(r.p, age * 90, Paint()..style = PaintingStyle.stroke..strokeWidth = 3..color = Colors.white.withValues(alpha: (1 - age / 3) * .7));
     }
   }
 
@@ -392,13 +392,13 @@ class _WorryState extends State<WorryPlayer> with SingleTickerProviderStateMixin
           child: phase == 1
               ? AnimatedBuilder(
                   animation: c,
-                  builder: (_, __) => Transform.translate(
+                  builder: (_, _) => Transform.translate(
                     offset: Offset(math.sin(c.value * 8) * 12, -300 * Curves.easeIn.transform(c.value)),
                     child: Opacity(
                       opacity: 1 - c.value,
                       child: Transform.scale(
                         scale: 1 - .4 * c.value,
-                        child: Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: Colors.white.withOpacity(.3), borderRadius: BorderRadius.circular(30)),
+                        child: Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(color: Colors.white.withValues(alpha: .3), borderRadius: BorderRadius.circular(30)),
                             child: Text(sent, textAlign: TextAlign.center, style: _white.copyWith(fontSize: 20, fontWeight: FontWeight.w600))),
                       ),
                     ),
@@ -420,7 +420,7 @@ class _WorryState extends State<WorryPlayer> with SingleTickerProviderStateMixin
                         controller: ctrl, maxLines: 3, maxLength: 120, onChanged: (_) => setState(() {}),
                         style: _white, cursorColor: Colors.white,
                         decoration: InputDecoration(hintText: 'Type it here...', hintStyle: const TextStyle(color: Colors.white54), counterStyle: const TextStyle(color: Colors.white54),
-                            filled: true, fillColor: Colors.white.withOpacity(.18), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none)),
+                            filled: true, fillColor: Colors.white.withValues(alpha: .18), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none)),
                       ),
                       const SizedBox(height: 6),
                       Text('Never saved. It disappears when you let it go.', style: _white.copyWith(color: Colors.white60, fontSize: 12)),
@@ -467,7 +467,7 @@ class _GratState extends State<GratitudePlayer> {
                 child: TextField(
                   controller: ctrl, style: _white, cursorColor: Colors.white, onSubmitted: (_) => _add(),
                   decoration: InputDecoration(hintText: 'e.g. a warm drink', hintStyle: const TextStyle(color: Colors.white54), filled: true,
-                      fillColor: Colors.white.withOpacity(.18), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none)),
+                      fillColor: Colors.white.withValues(alpha: .18), border: OutlineInputBorder(borderRadius: BorderRadius.circular(20), borderSide: BorderSide.none)),
                 ),
               ),
               IconButton(onPressed: _add, icon: const Icon(Icons.add_circle, color: Colors.white, size: 36)),
@@ -475,7 +475,7 @@ class _GratState extends State<GratitudePlayer> {
           Expanded(
             child: Container(
               margin: const EdgeInsets.only(top: 18, left: 30, right: 30), padding: const EdgeInsets.all(14), alignment: Alignment.bottomCenter,
-              decoration: BoxDecoration(color: Colors.white.withOpacity(.1), border: Border.all(color: Colors.white54, width: 3),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: .1), border: Border.all(color: Colors.white54, width: 3),
                   borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(44), bottomRight: Radius.circular(44), topLeft: Radius.circular(10), topRight: Radius.circular(10))),
               child: Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center, children: [
                 for (var i = 0; i < items.length; i++)
@@ -543,7 +543,7 @@ class _SqzState extends State<SqueezePlayer> {
               child: AnimatedContainer(
                 duration: Duration(milliseconds: down ? 500 : 1500), curve: Curves.easeInOut,
                 width: down ? 120 : 230, height: down ? 120 : 230, alignment: Alignment.center,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withOpacity(down ? .95 : .3)),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: down ? .95 : .3)),
                 child: Text(down ? 'HOLD' : 'PRESS', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 2, color: down ? const Color(0xFFB0609A) : Colors.white)),
               ),
             ),
@@ -574,7 +574,7 @@ class _DoodleState extends State<DoodlePlayer> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(28),
               child: Container(
-                color: Colors.white.withOpacity(.14),
+                color: Colors.white.withValues(alpha: .14),
                 child: GestureDetector(
                   onPanStart: (d) => setState(() => strokes.add([d.localPosition])),
                   onPanUpdate: (d) => setState(() => strokes.last.add(d.localPosition)),
@@ -628,7 +628,11 @@ class _ScanState extends State<BodyScanPlayer> {
   @override
   void initState() {
     super.initState();
-    tm = Timer.periodic(const Duration(seconds: 1), (_) { if (--s <= 0) _next(); else setState(() {}); });
+    tm = Timer.periodic(const Duration(seconds: 1), (_) { if (--s <= 0) {
+      _next();
+    } else {
+      setState(() {});
+    } });
   }
 
   void _next() {
@@ -650,7 +654,7 @@ class _ScanState extends State<BodyScanPlayer> {
               AnimatedAlign(
                 duration: const Duration(milliseconds: 1500), curve: Curves.easeInOut, alignment: Alignment(0, -.9 + i * .3),
                 child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white,
-                    boxShadow: [BoxShadow(color: Colors.white.withOpacity(.7), blurRadius: 28, spreadRadius: 6)])),
+                    boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: .7), blurRadius: 28, spreadRadius: 6)])),
               ),
             ]),
           ),

@@ -28,8 +28,9 @@ class UserProfile {
     final n = DateTime.now();
     var a = n.year - birthDate.year;
     if (n.month < birthDate.month ||
-        (n.month == birthDate.month && n.day < birthDate.day))
+        (n.month == birthDate.month && n.day < birthDate.day)) {
       a--;
+    }
     return a;
   }
 

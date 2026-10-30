@@ -44,7 +44,7 @@ class _MoodScreenState extends State<MoodScreen> {
                         scale: sel == i ? 1.05 : 1, duration: const Duration(milliseconds: 150),
                         child: Box(
                           selected: sel == i,
-                          color: sel == i ? kPrimary.withOpacity(.1) : Colors.white,
+                          color: sel == i ? kPrimary.withValues(alpha: .1) : Colors.white,
                           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                             Text(moods[i].$2, style: const TextStyle(fontSize: 38)),
                             const SizedBox(height: 6),

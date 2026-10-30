@@ -41,18 +41,21 @@ class _EditProfileState extends State<EditProfileScreen> {
     final f = await FilePicker.pickFile(type: FileType.image);
     if (f == null) return;
     final b = await f.readAsBytes();
-    if (b.length > 2 * 1024 * 1024)
+    if (b.length > 2 * 1024 * 1024) {
       return _msg('Please choose a picture under 2 MB.');
+    }
     setState(() => pic = b);
   }
 
   Future<void> _save() async {
     final u = user.text.trim().toLowerCase();
     if (name.text.trim().isEmpty) return _msg('Please enter a name.');
-    if (u.isNotEmpty && !RegExp(r'^[a-z0-9_]{3,20}$').hasMatch(u))
+    if (u.isNotEmpty && !RegExp(r'^[a-z0-9_]{3,20}$').hasMatch(u)) {
       return _msg('Username: 3-20 letters, numbers or _');
-    if (discoverable && u.isEmpty)
+    }
+    if (discoverable && u.isEmpty) {
       return _msg('Pick a username so friends can find you.');
+    }
     setState(() => saving = true);
     try {
       final url = pic == null ? null : await SocialService.uploadAvatar(pic!);
@@ -144,7 +147,7 @@ class _EditProfileState extends State<EditProfileScreen> {
               const SizedBox(height: 6),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                activeColor: kPrimary,
+                activeThumbColor: kPrimary,
                 value: discoverable && !minor,
                 onChanged: minor
                     ? null
