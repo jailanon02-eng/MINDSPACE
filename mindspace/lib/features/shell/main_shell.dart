@@ -10,6 +10,11 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   final unread = ChatService.unreadCount();
+  @override
+  void initState() {
+    super.initState();
+    ProgressService.refresh();
+  }
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<int>(
@@ -58,7 +63,7 @@ class _MainShellState extends State<MainShell> {
                 index: i,
                 children: const [
                   HomeTab(),
-                  ActivitiesTab(),
+                  ActivitiesHub(),
                   AppointmentsTab(),
                   MessagesScreen(),
                   ProfileTab(),
