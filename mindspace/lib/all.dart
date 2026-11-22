@@ -26,5 +26,12 @@ export 'features/activities/more_activities.dart';
 export 'features/activities/more_players.dart';
 export 'services/chat_service.dart';
 export 'features/messages/messages_screen.dart';
+
 export 'services/progress_service.dart';
 export 'features/activities/progress_screen.dart';
+
+// Recommendation
+export 'services/pop_sound.dart';
+export 'features/activities/jar_player.dart';
+export 'features/activities/hub.dart';
+export 'features/feeling/feeling_flow.dart';

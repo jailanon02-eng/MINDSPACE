@@ -404,13 +404,16 @@ class _ActivityRunnerState extends State<ActivityRunner> {
     timer?.cancel();
     final secs = total - left;
     minutesToday.value += (secs / 60).ceil().clamp(1, 5);
-    DbService.logActivity(widget.a.title, secs).catchError((_) {});
+    ProgressService.log(widget.a.title, widget.a.type, secs, true);
     setState(() => done = true);
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    final secs = total - left;
+    if (!done && secs >= 20)
+      ProgressService.log(widget.a.title, widget.a.type, secs, false);
     super.dispose();
   }
 
@@ -432,7 +435,16 @@ class _ActivityRunnerState extends State<ActivityRunner> {
       case Kind.worry:
         return WorryPlayer(onDone: _finish);
       case Kind.gratitude:
-        return GratitudePlayer(onDone: _finish);
+        return JarPlayer(
+          items: a.items.isEmpty
+              ? const [
+                  'gratitude',
+                  'One small thing that was okay today',
+                  'e.g. a warm drink',
+                ]
+              : a.items,
+          onDone: _finish,
+        );
       case Kind.squeeze:
         return SqueezePlayer(onDone: _finish);
       case Kind.doodle:

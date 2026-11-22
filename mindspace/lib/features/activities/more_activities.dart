@@ -744,4 +744,18 @@ const moreActivities = <Activity>[
     ["Anxiety", "Stress"],
     items: ["blobs", "#3F8F8A", "#6FA8DC"],
   ),
+  Activity(
+    "Compliment jar",
+    "Collect kind words about you",
+    "Write",
+    Icons.favorite,
+    Color(0xFFD89B2B),
+    Kind.gratitude,
+    [],
+    items: [
+      "compliment",
+      "Something kind about yourself",
+      "e.g. I showed up today",
+    ],
+  ),
 ];
